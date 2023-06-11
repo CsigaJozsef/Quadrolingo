@@ -1,0 +1,47 @@
+cache:
+    paths:
+        - node_modules/
+
+stages:
+    - setup
+    - test
+    - build
+    - deploy
+
+init:
+    image: node:latest
+    stage: setup
+    script:
+        - npm install
+
+check:
+    image: node:latest
+    stage: test
+    variables:
+        CI: "true"
+    script:
+        - npm run test
+
+build:
+    image: node:latest
+    stage: build
+    variables:
+        PUBLIC_URL: "/group-07/quadrolingo"
+    script:
+        - npm run build
+    artifacts:
+        paths:
+            - build/
+    only:
+        - master
+
+pages:
+    image: alpine:latest
+    stage: deploy
+    script:
+        - mv $CI_PROJECT_DIR/build/* public
+    artifacts:
+        paths:
+            - public
+    only:
+        - master
